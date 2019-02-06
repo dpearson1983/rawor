@@ -50,3 +50,5 @@ systems, e.g we stick with `int`, and `double`.
 This is a list of all the changes to this repository that we are currently working on.
 - Complete work on C header
 - Complete work on Python class
+- Comment the C++ header
+- Create documentation
