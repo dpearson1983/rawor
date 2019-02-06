@@ -42,7 +42,7 @@ libraries (in its present state, only numpy is required).
 ## Are there any operating system dependencies?
 Aside from passing `_USE_MATH_DEFINES` to the preproccessor when compiling in Windows, there should be no other operating
 system dependencies to worry about. However, we note that as of this writing the C++ code has only been tested on Fedora 
-GNU/Linux versions 28 and 29, and Windows 10. We don't anticipate any difficulties compiling on other operating systems
+GNU/Linux versions 28 and 29 (g++ (GCC) 8.2.1), and Windows 10 (Microsoft(R) C/C++ Optimizing Compiler Version 19.00.24234.1 for x86). We don't anticipate any difficulties compiling on other operating systems
 since only the C++ standard library is used, and we stick to variable types that should be defined the same on all operating
 systems, e.g we stick with `int`, and `double`.
 
