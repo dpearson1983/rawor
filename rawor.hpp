@@ -1,9 +1,64 @@
+/* rawor.hpp (RAndoms WithOut Randoms)
+ * MIT License
+ * Copyright (c) 2019 David Pearson (DWP)
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * This header only library will compute predict the RRR, DRR and DDR counts
+ * for use in the calculation of the three point correlation function (3PCF) of
+ * points in periodic boxes.
+ */
+
 #ifndef _RAWOR_HPP_
 #define _RAWOR_HPP_
 
 #include <vector>
 #include <cmath>
 
+/* The rawor class object is initialized with the number of data particles (e.g.
+ * dark matter particles, halos, or galaxies), the number of random particles
+ * the number of spherical shells in which pairs of particles are binned, the
+ * volume of the box, the maximum search radius for pairs, and optionally the 
+ * minimum search radius (default value of 0).
+ * 
+ * The public functions allow the user to change the number of data or random
+ * particles, as well as obtain arrays (std::vector<int>) of the RRR, DRR, and
+ * DDR counts. These arrays will contain many unused elements which correspond
+ * to permutations of the side lengths of triangles. This was done for 
+ * compatibility with other software that was written by DWP.
+ * 
+ * Private data members:
+ *      nbar_ran    = The average number density of random points. This is computed
+ *                    on initialization from the number of random points and the 
+ *                    volume of the box.
+ *      Delta_r     = The width of the spherical shells used for binning particles.
+ *                    This is computed on initialization from the maximum and 
+ *                    minimum search radii along with the number of shells
+ *      r_max       = Maximum search radius
+ *      r_min       = Minimum search radius (optional, default value 0)
+ *      V_box       = Volume of the box containing the data particles
+ *      N_parts     = Number of data particles
+ *      N_rans      = Number of random particles
+ *      N_shells    = Number of spherical shells
+ *      rs          = The central radii of the spherical shells
+ *      w           = Weights needed for the Gaussian quadrature integration
+ *      x           = Abscissae needed for Gaussian quadrature integration
+ */
 class rawor{
     double nbar_ran, Delta_r, r_max, r_min, V_box;
     int N_parts, N_rans, N_shells;
@@ -41,6 +96,8 @@ class rawor{
         std::vector<int> getDDR(std::vector<int> &DD);
 };
 
+// (Private) Simple function that initializes rs, w, and x at the time the rawor object is 
+// initialized.
 void rawor::initVectors() {
     for (int i = 0; i < rawor::N_shells; ++i) {
         rawor::rs.push_back(rawor::r_min + (i + 0.5)*rawor::Delta_r);
@@ -51,6 +108,9 @@ void rawor::initVectors() {
     rawor::x = {0.0000000000000000, -0.7745966692414834, 0.7745966692414834};
 }
 
+// (Private) Simple function that swaps two doubles if the first is larger than the second. 
+// This is used to ensure that the r which is feed into rawor::sphereOverlapVolume is in 
+// fact smaller than R so that volume evaluates correctly.
 void rawor::swapIfGreater(double &a, double &b) {
     if (a > b) {
         double temp = a;
@@ -59,6 +119,9 @@ void rawor::swapIfGreater(double &a, double &b) {
     }
 }
 
+// (Private) Function for computing the volume of overlap of two spheres. The conditional 
+// statements ensure that the volume is calculated correctly for cases where the two spheres
+// are not touching, and when the smaller sphere is completely within the larger sphere.
 double rawor::sphereOverlapVolume(double d, double R, double r) {
     double V = 0;
     swapIfGreater(r, R);
@@ -72,6 +135,8 @@ double rawor::sphereOverlapVolume(double d, double R, double r) {
     return V;
 }
 
+// Function for computing the overlap volume of two spherical shells from the overlap volumes
+// of the various spheres that make up the shells.
 double rawor::crossSectionVolume(double r1, double r2, double r3) {
     double V_oo = sphereOverlapVolume(r1, r3 + 0.5*rawor::Delta_r, r2 + 0.5*rawor::Delta_r);
     double V_oi = sphereOverlapVolume(r1, r3 + 0.5*rawor::Delta_r, r2 - 0.5*rawor::Delta_r);
