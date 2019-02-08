@@ -1,6 +1,9 @@
 /* rawor.hpp (RAndoms WithOut Randoms)
+ * 
  * MIT License
- * Copyright (c) 2019 David Pearson (DWP)
+ * 
+ * Copyright (c) 2019 David W. Pearson (DWP)
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -135,8 +138,8 @@ double rawor::sphereOverlapVolume(double d, double R, double r) {
     return V;
 }
 
-// Function for computing the overlap volume of two spherical shells from the overlap volumes
-// of the various spheres that make up the shells.
+// (Private) Function for computing the overlap volume of two spherical shells from the 
+// overlap volumes of the various spheres that make up the shells.
 double rawor::crossSectionVolume(double r1, double r2, double r3) {
     double V_oo = sphereOverlapVolume(r1, r3 + 0.5*rawor::Delta_r, r2 + 0.5*rawor::Delta_r);
     double V_oi = sphereOverlapVolume(r1, r3 + 0.5*rawor::Delta_r, r2 - 0.5*rawor::Delta_r);
@@ -146,6 +149,8 @@ double rawor::crossSectionVolume(double r1, double r2, double r3) {
     return V_oo - V_oi - V_io + V_ii;
 }
 
+// (Private) Function that returns the appropriate number of permutations for a bin based 
+// on the side lengths.
 int rawor::getPermutations(double r1, double r2, double r3) {
     int perm = 1;
     if (r1 != r2 && r1 != r3 && r2 != r3) {
@@ -156,12 +161,19 @@ int rawor::getPermutations(double r1, double r2, double r3) {
     return perm;
 }
 
+
+// (Private) Function that returns the volume of a spherical shell given the shells central
+// radius and the shell width stored in class data member Delta_r
 double rawor::sphericalShellVolume(double r) {
     double r_o = r + 0.5*rawor::Delta_r;
     double r_i = r - 0.5*rawor::Delta_r;
     return 4.0*M_PI*(r_o*r_o*r_o - r_i*r_i*r_i)/3.0;
 }
 
+// (Private) Function that takes the data-data pair counts and used them to linearly 
+// interpolate the number density to a specific location r. The r1 value should be 
+// the central radius of the shell that r falls in. The pair counts should include
+// double counting but no self pairs.
 double rawor::nbarData(std::vector<int> &DD, double r, double r1) {
     int bin = r/rawor::Delta_r;
     double nbar = DD[bin]/(rawor::N_parts*sphericalShellVolume(r1));
@@ -194,6 +206,8 @@ double rawor::nbarData(std::vector<int> &DD, double r, double r1) {
     return nbar;
 }
 
+// (Private) Function that performs the Gaussian quadrature numerical integration for the RRR
+// and DRR predicted counts.
 double rawor::gaussQuadCrossSection(double r1, double r2, double r3) {
     double result = 0.0;
     for (int i = 0; i < rawor::w.size(); ++i) {
@@ -203,6 +217,9 @@ double rawor::gaussQuadCrossSection(double r1, double r2, double r3) {
     return result;
 }
 
+// (Private) Function that performs the Gaussian quadrature numerical integration for the DDR 
+// predicted counts. This is a separate function given the need to allow for a variable number
+// density in this case.
 double rawor::gaussQuadCrossSectionDDR(std::vector<int> &DD, double r1, double r2, double r3) {
     double result = 0.0;
     for (int i = 0; i < rawor::w.size(); ++i) {
@@ -213,6 +230,8 @@ double rawor::gaussQuadCrossSectionDDR(std::vector<int> &DD, double r1, double r
     return result;
 }
 
+// (Public) Initializer function that sets all of the data members to the provided values. The 
+// value of rMin can be omitted if one is using the default value of 0.
 rawor::rawor(int numParticles, int numRandoms, int numShells, double VolBox, double rMax, double rMin) {
     rawor::N_parts = numParticles;
     rawor::N_rans = numRandoms;
@@ -225,15 +244,32 @@ rawor::rawor(int numParticles, int numRandoms, int numShells, double VolBox, dou
     rawor::initVectors();
 }
 
+// (Public) Function that resets the value of the data member N_parts. This should be useful
+// when analyzing a large number of simulations where the exact number of particles may 
+// vary slightly between the realizations. Since the values of the numbers of shells, volume
+// of the box and search radii would be unlikely to change, the use can simply use this
+// to update the number of particles instead of declaring a new class object for each
+// simulation.
 void rawor::updateNumParts(int numParticles) {
     rawor::N_parts = numParticles;
 }
 
+// (Public) Function that resets the value of the data member N_rans. This should be useful
+// for the same reasons outlined for rawor::updateNumParts. If the number of particles 
+// changes between realizations and one wants to keep the ratio of the number of particles
+// to the number of randoms constant, it would be necessary to also change this value.
 void rawor::updateNumRans(int numRandoms) {
     rawor::N_rans = numRandoms;
     rawor::nbar_ran = numRandoms/rawor::V_box;
 }
 
+// (Public) Function that returns the RRR predicted counts. The array size will be N_shells^3
+// even though many elements (those which are permutations or the filled in r1, r2, r3 bins)
+// will be zero. There are two reasons this decision was made. First, this allows one to 
+// very simply calculate the associated bin index given the values of r1, r2, and r3 (sorted
+// so that r1 <= r2 <= r3 to access the non-zero bin). Second, because of the simplicity in
+// calculating the index for such a padded array, this was necessary for compatibility with
+// other software written by DWP for counting the DDD triangles.
 std::vector<int> rawor::getRRR() {
     std::vector<int> N(rawor::N_shells*rawor::N_shells*rawor::N_shells);
     for (int i = 0; i < rawor::N_shells; ++i) {
@@ -251,6 +287,8 @@ std::vector<int> rawor::getRRR() {
     return N;
 }
 
+// (Public) Function that returns the DRR predicted counts. The array size will be N_shells^3.
+// See the comment/documentation of rawor::getRRR() for the reasons behind this decision.
 std::vector<int> rawor::getDRR() {
     std::vector<int> N(rawor::N_shells*rawor::N_shells*rawor::N_shells);
     for (int i = 0; i < rawor::N_shells; ++i) {
@@ -268,6 +306,17 @@ std::vector<int> rawor::getDRR() {
     return N;
 }
 
+// (Public) Function that returns the DDR predicted counts. The array size will be N_shells^3
+// for the same reasons given previously in the comment/documentation for rawor::getRRR(). The 
+// main differences between this function and the other two is that the permutations have to
+// calculated explicitly since the number density will change based on which side you set as
+// the distance between the data-data pair, and that you actually have to call this function
+// with additional information, namely the data-data pair counts. These pair counts should
+// include double counting (you can still use tricks that avoid explicit double counting for
+// speed if needed, just make sure to count up by 2 instead of 1). The reason for needing
+// the double counting again comes down to compatibility issues with other software written
+// by DWP (their pair counting algorithm was implemented on the GPU, where memory access
+// pecularities made it more efficient to double count than not).
 std::vector<int> rawor::getDDR(std::vector<int> &DD) {
     std::vector<int> N(rawor::N_shells*rawor::N_shells*rawor::N_shells);
     for (int i = 0; i < rawor::N_shells; ++i) {
