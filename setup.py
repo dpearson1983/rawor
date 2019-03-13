@@ -11,5 +11,9 @@ setup(name='rawor',
       ext_modules=[
           Extension("rawor", ["rawor/pyRawor.cpp"],
           libraries=["boost_python3", "boost_numpy3"])
-      ])
+      ],
+      classifiers=[
+          "Programming Language :: Python :: 3",
+          "Operating System :: Linux"
+      ],)
                    
