@@ -1,5 +1,6 @@
 import numpy as np
 import rawor
+import time
 
 V_box = 1024.0**3
 num_parts = 499362
@@ -19,9 +20,11 @@ print(my_predictor.get_num_shells())
 print(my_predictor.get_V_box())
 print(my_predictor.get_r_max())
 print(my_predictor.get_r_min())
+start = time.time()
 RRR = my_predictor.get_RRR()
 DRR = my_predictor.get_DRR()
 DDR = my_predictor.get_DDR(DD)
+end = time.time()
 test = np.zeros(len(RRR))
 
 print(RRR)
@@ -36,3 +39,5 @@ print(RRR[4])
 
 ZZZ = RRR*test
 print(ZZZ)
+
+print("Time to predict randoms: " + str(end - start) + " s")
