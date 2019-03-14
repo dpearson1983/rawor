@@ -81,12 +81,13 @@ my_predictor.set_r_max(r_max)
 my_predictor.set_r_min(r_min)
 my_predictor.set_V_box(V_box)
 ```
-and of course there are corresponding get functions as well.
+and of course there are corresponding get functions as well. Unlike in the C++ version, the numpy arrays returned here are only the non-redundant values where r_1 <= r_2 <= r_3 for values which satisfy the triangle condition. A function will be added so to return the (r_1, r_2, r_3) information for the bins.
 
 # TO DO
 This is a list of all the changes to this repository that we are currently working on.
 - Complete work on C header
 - ~~Complete work on Python class~~
 - ~~Comment the C++ header~~
-- Change to only return the non-redundant bins which satisfy the triangle condition.
+- Change the C++ version to only return the non-redundant bins which satisfy the triangle condition.
+- Add functions to return bin information
 - Create documentation
