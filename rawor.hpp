@@ -100,6 +100,18 @@ class rawor{
         
         void setVBox(double VBox);
         
+        int getNumParts();
+        
+        int getNumRans();
+        
+        int getNumShells();
+        
+        double getRMax();
+        
+        double getRMin();
+        
+        double getVBox();
+        
         std::vector<int> getRRR();
         
         std::vector<int> getDRR();
