@@ -38,7 +38,7 @@ For C++, place rawor.hpp in your project directory (i.e. where your code that wi
 ```
 to your list of include statements to make the rawor class accessible in your code. Create a class object with the needed information for the computations
 ```c++
-rawor ranPredictor(N_data, N_rans, N_shells, V_box, r_max, r_min)
+rawor ranPredictor(N_data, N_rans, N_shells, V_box, r_max, r_min);
 ```
 then simply get the RRR, DRR, and DDR counts
 ```c++
