@@ -47,7 +47,7 @@ std::vector<int> DRR = ranPredictor.getDRR();
 std::vector<int> DDR = ranPredictor.getDDR(DD);
 ```
 where `DD` are your pair counts in the `N_shells` bins between `r_min` and `r_max`. The vectors that are returned have `N_shells*N_shells*N_shells` elements. The first element corresponds to r_1 = r_2 = r_3 = r_min + Delta_r/2, the next bin then increments r_3 by Delta_r. This repeats until r_3 = r_max - Delta_r/2, after which
-r_3 rolls back, and r_2 is incremented. The process continues until r_2 reaches r_max - Delta_r/2, at which point it rolls back and r_1 is incremented. This all repeats until the last bin where r_1 = r_2 = r_3 = r_max - Delta_r/2. You can change any of the 
+r_3 rolls back, and r_2 is incremented. The process continues until r_2 reaches r_max - Delta_r/2, at which point it rolls back and r_1 is incremented. This all repeats until the last bin where r_1 = r_2 = r_3 = r_max - Delta_r/2. This will likely be simplified in the future and a function added to give the bin information. You can change any of the 
 initial values provided when creating the class object using the corresponding set function
 ```c++
 ranPredictor.setNumParts(N_data);
@@ -59,9 +59,34 @@ ranPredictor.setVBox(V_box);
 ```
 should the need arise, to prevents having to create a new class object. There are also corresponding get functions that return the current values.
 
+For the Python library, the usage is very similar:
+```python
+import numpy as np
+import rawor
+.
+.
+.
+my_predictor = rawor.rawor(N_parts, N_rans, N_shells, V_box, r_max, r_min)
+
+RRR = my_predictor.get_RRR()
+DRR = my_predictor.get_DRR()
+DDR = my_predictor.get_DDR(DD)
+.
+.
+.
+my_predictor.set_num_parts(N_parts)
+my_predictor.set_num_rans(N_rans)
+my_predictor.set_num_shells(N_shells)
+my_predictor.set_r_max(r_max)
+my_predictor.set_r_min(r_min)
+my_predictor.set_V_box(V_box)
+```
+and of course there are corresponding get functions as well.
+
 # TO DO
 This is a list of all the changes to this repository that we are currently working on.
 - Complete work on C header
 - ~~Complete work on Python class~~
 - ~~Comment the C++ header~~
+- Change to only return the non-redundant bins which satisfy the triangle condition.
 - Create documentation
