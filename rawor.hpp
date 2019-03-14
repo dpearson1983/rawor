@@ -88,9 +88,17 @@ class rawor{
     public:
         rawor(int numParticles, int numRandoms, int numShells, double VolBox, double rMax, double rMin = 0);
         
-        void updateNumParts(int numParticles);
+        void setNumParts(int numParticles);
         
-        void updateNumRans(int numRandoms);
+        void setNumRans(int numRandoms);
+        
+        void setNumShells(int numShells);
+        
+        void setRMax(double rMax);
+        
+        void setRMin(double rMin);
+        
+        void setVBox(double VBox);
         
         std::vector<int> getRRR();
         
@@ -250,7 +258,7 @@ rawor::rawor(int numParticles, int numRandoms, int numShells, double VolBox, dou
 // of the box and search radii would be unlikely to change, the use can simply use this
 // to update the number of particles instead of declaring a new class object for each
 // simulation.
-void rawor::updateNumParts(int numParticles) {
+void rawor::setNumParts(int numParticles) {
     rawor::N_parts = numParticles;
 }
 
@@ -258,9 +266,67 @@ void rawor::updateNumParts(int numParticles) {
 // for the same reasons outlined for rawor::updateNumParts. If the number of particles 
 // changes between realizations and one wants to keep the ratio of the number of particles
 // to the number of randoms constant, it would be necessary to also change this value.
-void rawor::updateNumRans(int numRandoms) {
+void rawor::setNumRans(int numRandoms) {
     rawor::N_rans = numRandoms;
     rawor::nbar_ran = numRandoms/rawor::V_box;
+}
+
+// (Public) Function that resets the value of the data member N_shells. This will force
+// a recalculation of the Delta_r data member.
+void rawor::setNumShells(int numShells) {
+    rawor::N_shells = numShells;
+    rawor::Delta_r = (rawor::r_max - rawor::r_min)/rawor::N_shells;
+}
+
+// (Public) Function that resets the value of the data member r_max. This will force
+// a recalculation of the Delta_r data member.
+void rawor::setRMax(double rMax) {
+    rawor::r_max = rMax;
+    rawor::Delta_r = (rawor::r_max - rawor::r_min)/rawor::N_shells;
+}
+
+// (Public) Function that resets the value of the data member r_min. This will force
+// a recalculation of the Delta_r data member.
+void rawor::setRMin(double rMin) {
+    rawor::r_min = rMin;
+    rawor::Delta_r = (rawor::r_max - rawor::r_min)/rawor::N_shells;
+}
+
+// (Public) Function that resets the value of the data member V_box. This will force
+// a recalculation of the nbar_ran data member.
+void rawor::setVBox(double VBox) {
+    rawor::V_box = VBox;
+    rawor::nbar_ran = rawor::N_rans/rawor::V_box;
+}
+
+// (Public) Returns the current value of N_parts
+int rawor::getNumParts() {
+    return rawor::N_parts;
+}
+
+// (Public) Returns the current value of N_rans
+int rawor::getNumRans() {
+    return rawor::N_rans;
+}
+
+// (Public) Returns the current value of N_shells
+int rawor::getNumShells() {
+    return rawor::N_shells;
+}
+
+// (Public) Returns the current value of V_box
+double rawor::getVBox() {
+    return rawor::V_box;
+}
+
+// (Public) Returns the current value of r_min
+double rawor::getRMin() {
+    return rawor::r_min;
+}
+
+// (Public) Returns the current value of r_max
+double rawor::getRMax() {
+    return rawor::r_max;
 }
 
 // (Public) Function that returns the RRR predicted counts. The array size will be N_shells^3
