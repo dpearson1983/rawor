@@ -46,7 +46,17 @@ std::vector<int> RRR = ranPredictor.getRRR();
 std::vector<int> DRR = ranPredictor.getDRR();
 std::vector<int> DDR = ranPredictor.getDDR(DD);
 ```
-where `DD` are your pair counts in the `N_shells` bins between `r_min` and `r_max`.
+where `DD` are your pair counts in the `N_shells` bins between `r_min` and `r_max`. You can change any of the 
+initial values provided when creating the class object using the corresponding set function
+```c++
+ranPredictor.setNumParts(N_data);
+ranPredictor.setNumRans(N_rans);
+ranPredictor.setNumShells(N_shells);
+ranPredictor.setRMax(r_max);
+ranPredictor.setRMin(r_min);
+ranPredictor.setVBox(V_box);
+```
+should the need arise, to prevents having to create a new class object. There are also corresponding get functions that return the current values.
 
 # TO DO
 This is a list of all the changes to this repository that we are currently working on.
