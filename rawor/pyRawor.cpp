@@ -313,7 +313,6 @@ np::ndarray rawor::getDDR(np::ndarray const &dd) {
     np::dtype dt = np::dtype::get_builtin<int>();
     np::ndarray n = np::zeros(bp::make_tuple(N.size()), dt);
     std::copy(N.begin(), N.end(), reinterpret_cast<int*>(n.get_data()));
-    delete[] DD;
     return n;
 }
 

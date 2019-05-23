@@ -27,6 +27,8 @@ DDR = my_predictor.get_DDR(DD)
 end = time.time()
 test = np.zeros(len(RRR))
 
+print(DD[0])
+
 print(RRR)
 print(DRR)
 print(DDR)

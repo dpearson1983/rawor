@@ -15,7 +15,7 @@ setup(name='rawor',
     license='MIT',
     ext_modules=[
         Extension("rawor", ["rawor/pyRawor.cpp"],
-        libraries=["boost_python3", "boost_numpy3"])
+        libraries=["boost_python37", "boost_numpy37"])
     ],
     classifiers=[
         "Programming Language :: Python :: 3"
